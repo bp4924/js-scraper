@@ -7,9 +7,22 @@ const app = express();
 
 const url = "https://www.theguardian.com/us";
 
-app.listen(PORT, () => console.log(`server running on port ${PORT}`));
+axios(url)
+  .then((response) => {
+    const html = response.data;
+    const $ = cheerio.load(html);
+    const articles = [];
+    //check site for desired class name of articles
+    $(".fc-item__title", html).each(function () {
+      const title = $(this).text();
+      const url = $(this).find("a").attr("href");
+      articles.push({
+        title,
+        url,
+      });
+    });
+    console.log(articles);
+  })
+  .catch((err) => console.log(err));
 
-axios(url).then((response) => {
-  const html = response.data;
-  console.log(html);
-});
+app.listen(PORT, () => console.log(`server running on port ${PORT}`));
